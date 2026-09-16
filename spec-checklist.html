@@ -1721,27 +1721,60 @@
 
     // Dynamic stats update from checkboxes
     const checkboxes = document.querySelectorAll('.task-checkbox');
+
+    function setTaskCompleted(checkbox, completed) {
+      const item = checkbox.closest('.task-item');
+      checkbox.checked = completed;
+      if (completed) {
+        item.classList.add('done');
+        item.dataset.status = 'done';
+      } else {
+        item.classList.remove('done');
+        item.dataset.status = 'not-started';
+      }
+
+      const chip = item.querySelector('.chip-status');
+      if (chip) {
+        chip.className = `chip-status ${completed ? 'done' : 'not-started'}`;
+        chip.textContent = completed ? 'done' : 'not-started';
+      }
+    }
+
+    async function loadSavedState() {
+      try {
+        const response = await fetch('/api/state');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const { states } = await response.json();
+        checkboxes.forEach((checkbox) => {
+          const savedValue = states[checkbox.dataset.key];
+          if (typeof savedValue === 'boolean') {
+            setTaskCompleted(checkbox, savedValue);
+          }
+        });
+        recalculateProgress();
+      } catch (error) {
+        console.warn('Could not load saved checklist state:', error);
+      }
+    }
+
+    async function saveState(checkbox) {
+      try {
+        const response = await fetch(`/api/state/${encodeURIComponent(checkbox.dataset.key)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ completed: checkbox.checked }),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      } catch (error) {
+        console.warn('Could not save checklist state:', error);
+      }
+    }
+
     checkboxes.forEach(cb => {
       cb.addEventListener('change', () => {
-        const item = cb.closest('.task-item');
-        if (cb.checked) {
-          item.classList.add('done');
-          item.dataset.status = 'done';
-          const chip = item.querySelector('.chip-status');
-          if (chip) {
-            chip.className = 'chip-status done';
-            chip.textContent = 'done';
-          }
-        } else {
-          item.classList.remove('done');
-          item.dataset.status = 'not-started';
-          const chip = item.querySelector('.chip-status');
-          if (chip) {
-            chip.className = 'chip-status not-started';
-            chip.textContent = 'not-started';
-          }
-        }
+        setTaskCompleted(cb, cb.checked);
         recalculateProgress();
+        saveState(cb);
       });
     });
 
@@ -1757,6 +1790,8 @@
       document.getElementById('bd-done').textContent = checked;
       document.getElementById('bd-rem').textContent = total - checked;
     }
+
+    loadSavedState();
   </script>
 </body>
 </html>
