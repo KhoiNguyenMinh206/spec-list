@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nanobot IDP — Unified Spec Checklist (Dev 1 &amp; Dev 2)</title>
+  <style>
+    :root {
+      --bg: #0c0e14;
+      --surface: #141722;
+      --card: #1c2030;
+      --card-hover: #242940;
+      --border: #2b324c;
+      --border-focus: #4b5884;
+      
+      --accent: #4f78ff;
+      --accent-glow: rgba(79, 120, 255, 0.25);
+      
+      --dev1: #00b4d8;
+      --dev1-bg: rgba(0, 180, 216, 0.12);
+      --dev1-border: rgba(0, 180, 216, 0.35);
+      
+      --dev2: #10b981;
+      --dev2-bg: rgba(16, 185, 129, 0.12);
+      --dev2-border: rgba(16, 185, 129, 0.35);
+
+      --joint: #f59e0b;
+      --joint-bg: rgba(245, 158, 11, 0.12);
+      --joint-border: rgba(245, 158, 11, 0.35);
+
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --orange: #f39c12;
+      --red: #ef4444;
+      --muted: #7982a6;
+      --text: #e2e8f5;
+      --text-dim: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 32px 24px 80px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    header {
+      margin-bottom: 28px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h1 .badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      color: #8bb2ff;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* SUMMARY STATS TILES */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* OVERALL PROGRESS BAR */
+    .progress-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+
+    .progress-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .progress-pct {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: var(--card);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #10b981, #00b4d8);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .progress-breakdown {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 13px;
+      color: var(--text-dim);
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .breakdown-item strong {
+      color: #fff;
+    }
+
+    /* CONTROLS & FILTER BAR */
+    .controls-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    .filter-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover {
+      background: var(--card-hover);
+      color: #fff;
+      border-color: var(--border-focus);
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    .filter-btn[data-dev="dev1"].active {
+      background: var(--dev1);
+      border-color: var(--dev1);
+    }
+
+    .filter-btn[data-dev="dev2"].active {
+      background: var(--dev2);
+      border-color: var(--dev2);
+    }
+
+    .search-input {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      color: #fff;
+      width: 220px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* WAVE SECTION */
+    .wave-section {
+      margin-bottom: 32px;
+    }
+
+    .wave-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wave-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wave-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-dim);
+    }
+
+    .wave-stats {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* TASK LIST */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      list-style: none;
+    }
+
+    .task-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    }
+
+    .task-item:hover {
+      background: var(--card);
+      border-color: var(--border-focus);
+      transform: translateX(2px);
+    }
+
+    .task-item.done {
+      opacity: 0.72;
+    }
+
+    .task-item.done:hover {
+      opacity: 0.95;
+    }
+
+    .task-checkbox {
+      margin-top: 3px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--green);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .task-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .task-header-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .task-key {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: #94a3b8;
+    }
+
+    .task-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .task-item.done .task-title {
+      text-decoration: line-through;
+      color: var(--text-dim);
+    }
+
+    /* CHIPS & BADGES */
+    .badge-dev {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-dev.dev1 {
+      background: var(--dev1-bg);
+      color: var(--dev1);
+      border: 1px solid var(--dev1-border);
+    }
+
+    .badge-dev.dev2 {
+      background: var(--dev2-bg);
+      color: var(--dev2);
+      border: 1px solid var(--dev2-border);
+    }
+
+    .badge-dev.joint {
+      background: var(--joint-bg);
+      color: var(--joint);
+      border: 1px solid var(--joint-border);
+    }
+
+    .chip-status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .chip-status.done {
+      background: rgba(46, 204, 113, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .chip-status.in-progress {
+      background: rgba(241, 196, 15, 0.15);
+      color: var(--yellow);
+      border: 1px solid rgba(241, 196, 15, 0.3);
+    }
+
+    .chip-status.not-started {
+      background: rgba(121, 130, 166, 0.12);
+      color: var(--muted);
+      border: 1px solid rgba(121, 130, 166, 0.25);
+    }
+
+    .task-desc {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .task-meta {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .task-dep {
+      color: #cbd5e1;
+    }
+
+    .task-dep strong {
+      color: var(--orange);
+    }
+
+    /* FOOTER */
+    footer {
+      margin-top: 48px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1>
+            Nanobot IDP — Unified Spec Checklist
+            <span class="badge">Team Pilot</span>
+          </h1>
+          <p>Kế hoạch thực thi phối hợp giữa <strong>Dev 1</strong> (chính/nền tảng &amp; patch Nanobot) và <strong>Dev 2</strong> (phối hợp &amp; hệ sinh thái ngoài).</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- STATS TILES -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Tổng Story</div>
+        <div class="stat-value" id="stat-total">74</div>
+        <div class="stat-sub">Toàn bộ sprint 74 story</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Đã Hoàn Thành</div>
+        <div class="stat-value" style="color: var(--green);" id="stat-completed">50</div>
+        <div class="stat-sub" id="stat-pct">67.6% hoàn thành</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Dev 1 (Chính)</div>
+        <div class="stat-value" style="color: var(--dev1);" id="stat-dev1">28 / 44</div>
+        <div class="stat-sub">Patch surface, IAM &amp; GKE</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Dev 2 (Phối hợp)</div>
+        <div class="stat-value" style="color: var(--dev2);" id="stat-dev2">21 / 28</div>
+        <div class="stat-sub">Guard, Gateway, Memory &amp; Skills</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Chung (Dev 1 &amp; 2)</div>
+        <div class="stat-value" style="color: var(--joint);" id="stat-joint">1 / 2</div>
+        <div class="stat-sub">Nghiệm thu staging, tool built-in</div>
+      </div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div class="progress-section">
+      <div class="progress-header">
+        <div class="progress-title">Tiến độ Sprint Toàn Diện</div>
+        <div class="progress-pct" id="bar-pct">67.6%</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="bar-fill" style="width: 67.6%;"></div>
+      </div>
+      <div class="progress-breakdown">
+        <div class="breakdown-item">Đã xong: <strong id="bd-done">50</strong></div>
+        <div class="breakdown-item">Đang làm: <strong id="bd-prog" style="color: var(--yellow);">1</strong> (7-4)</div>
+        <div class="breakdown-item">Chưa bắt đầu: <strong id="bd-rem" style="color: var(--muted);">23</strong></div>
+        <div class="breakdown-item">Test Suite: <strong style="color: var(--green);">977 passed</strong> (100%)</div>
+        <div class="breakdown-item">Import Linter: <strong style="color: var(--green);">8/8 contracts</strong></div>
+      </div>
+    </div>
+
+    <!-- CONTROLS & FILTER BAR -->
+    <div class="controls-bar">
+      <div class="filter-group">
+        <span class="filter-label">Phân công:</span>
+        <button class="filter-btn active" data-filter="dev" data-val="all">Tất cả</button>
+        <button class="filter-btn" data-filter="dev" data-val="dev1" data-dev="dev1">Dev 1</button>
+        <button class="filter-btn" data-filter="dev" data-val="dev2" data-dev="dev2">Dev 2</button>
+        <button class="filter-btn" data-filter="dev" data-val="joint">Dev 1 &amp; 2</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Trạng thái:</span>
+        <button class="filter-btn active" data-filter="status" data-val="all">Tất cả</button>
+        <button class="filter-btn" data-filter="status" data-val="done">Đã xong</button>
+        <button class="filter-btn" data-filter="status" data-val="in-progress">Đang làm</button>
+        <button class="filter-btn" data-filter="status" data-val="not-started">Chưa làm</button>
+      </div>
+      <div>
+        <input type="text" class="search-input" id="search-box" placeholder="Tìm theo mã hoặc tên..." />
+      </div>
+    </div>
+
+    <!-- MAIN TASK SECTIONS BY WAVE -->
+    <main id="tasks-container">
+
+      <!-- ================= WAVE 0 ================= -->
+      <section class="wave-section" data-wave="0">
+        <div class="wave-header">
+          <div class="wave-title">
+            Wave 0 — Nền tảng (Chạy một mình)
+            <span class="wave-badge">Wave 0</span>
+          </div>
+          <div class="wave-stats">3/4 Done</div>
+        </div>
+        <ul class="task-list">
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="1-1" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">1-1</span>
+                <span class="task-title">Tái cấu trúc src/ + tách packages/guard_core/</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Tách kiến trúc clean architecture, cô lập guard_core không phụ thuộc IDP.</div>
+              <div class="task-meta"><span>dep: —</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="1-5" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">1-5</span>
+                <span class="task-title">Compose đủ stand-in + Dockerfile</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Dựng docker-compose với đủ 5 stand-ins (db, neo4j, redis, fake-gcs, litellm), Dockerfile bake layers/ và tích hợp mise.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>1-1</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="1-6" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">1-6</span>
+                <span class="task-title">Hợp đồng token danh tính + dummy_be/</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Đặc tả token JWT và mock BE cho offline testing, khớp với hợp đồng E1 Elixir.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>1-1</strong> (Đường găng chặn 5-1, 5-8)</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="1-7" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">1-7</span>
+                <span class="task-title">Đưa layers/ ra gốc và bake vào image</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Chuyển data/layers thành layers/ ở root, xem như mã nguồn chỉ đọc.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ================= WAVE 1 ================= -->
+      <section class="wave-section" data-wave="1">
+        <div class="wave-header">
+          <div class="wave-title">
+            Wave 1 — Hạ tầng dự án &amp; Contracts
+            <span class="wave-badge">Wave 1</span>
+          </div>
+          <div class="wave-stats">3/3 Done</div>
+        </div>
+        <ul class="task-list">
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="1-2" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">1-2</span>
+                <span class="task-title">Sửa vi phạm AD-4 trong nanobot_bridge.py</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Chuẩn hóa exception sang IdentityUnknown / IdentityMissing có machine enum.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="1-3" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">1-3</span>
+                <span class="task-title">packages/idp_contracts/errors.py — enum reason_machine</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Xây dựng hợp đồng lỗi chuẩn hóa toàn bộ hệ thống.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="1-4" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">1-4</span>
+                <span class="task-title">pyproject.toml + import-linter 8 contracts + CI</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Khóa ranh giới kiến trúc bằng linter tự động trong CI.</div>
+              <div class="task-meta"><span>dep: 1-1, 1-3</span></div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ================= WAVE 2 ================= -->
+      <section class="wave-section" data-wave="2">
+        <div class="wave-header">
+          <div class="wave-title">
+            Wave 2 — Quyền &amp; Guard (Hai Làn Song Song)
+            <span class="wave-badge">Wave 2</span>
+          </div>
+          <div class="wave-stats">8/8 Done</div>
+        </div>
+        <ul class="task-list">
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="2-1" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">2-1</span>
+                <span class="task-title">PDP lấy giao, không lấy hợp</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Giao quyền hạn người dùng và ngữ cảnh chat.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="2-2" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">2-2</span>
+                <span class="task-title">context_scope trong PDP + bảng workingset</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Quản lý bảng dữ liệu được phép đọc trong working set.</div>
+              <div class="task-meta"><span>dep: 2-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="2-7" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">2-7</span>
+                <span class="task-title">PDP trả grant_source</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Truy vết nguồn gốc quyền cấp từ phòng ban, vai trò hay dự án.</div>
+              <div class="task-meta"><span>dep: 2-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="2-3" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">2-3</span>
+                <span class="task-title">Guard R4–R6: Chặn schema modification, DDL, function injection</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Kiểm duyệt SQL AST chặn thay đổi schema và tiêm hàm độc hại.</div>
+              <div class="task-meta"><span>dep: 1-3</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="2-4" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">2-4</span>
+                <span class="task-title">R7 k-anonymity chiều tĩnh</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Chặn truy vấn định danh cá nhân khi nhóm nhỏ hơn ngưỡng k.</div>
+              <div class="task-meta"><span>dep: 2-3</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="2-5" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">2-5</span>
+                <span class="task-title">R9 out_of_working_set</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Từ chối truy vấn các bảng nằm ngoài working set đã cấp.</div>
+              <div class="task-meta"><span>dep: 1-3, 2-2</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="2-6" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">2-6</span>
+                <span class="task-title">Va chạm tên bảng + bộ test tấn công</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Xử lý prefix dataset, alias va chạm, 41 test an toàn AST.</div>
+              <div class="task-meta"><span>dep: 2-3, 2-4</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="2-8" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">2-8</span>
+                <span class="task-title">Guard Cypher C1–C5 (Chặn lỗ hổng đồ thị Neo4j)</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Đóng 5 lỗ hổng Cypher: C3 lỗ chính, APOC injection, WRITE mutation.</div>
+              <div class="task-meta"><span>dep: 1-3, 2-4</span></div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ================= WAVE 3 ================= -->
+      <section class="wave-section" data-wave="3">
+        <div class="wave-header">
+          <div class="wave-title">
+            Wave 3 — Prompt &amp; Trí nhớ (Hai Làn Song Song)
+            <span class="wave-badge">Wave 3</span>
+          </div>
+          <div class="wave-stats">14/14 Done</div>
+        </div>
+        <ul class="task-list">
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="3-1" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">3-1</span>
+                <span class="task-title">Segment ① và ⑩ trong AGENTS.md</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Kẹp prompt rules tổ chức ở đầu và cuối context window.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="3-6" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">3-6</span>
+                <span class="task-title">Prefix ổn định từ byte 0 cho cache Vertex AI</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Chuẩn hóa prompt prefix bảo toàn Vertex prefix cache qua nhiều phiên.</div>
+              <div class="task-meta"><span>dep: 3-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="3-2" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">3-2</span>
+                <span class="task-title">layers_loader là chủ sở hữu duy nhất việc nối</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Không để các nơi khác tự ghép file markdown vào prompt.</div>
+              <div class="task-meta"><span>dep: 3-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="3-3" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">3-3</span>
+                <span class="task-title">Nạp layers/ vào RAM lúc boot</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Đọc trước toàn bộ tầng layer vào bộ nhớ, giảm disk I/O mỗi lượt.</div>
+              <div class="task-meta"><span>dep: 1-7, 3-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="3-4" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">3-4</span>
+                <span class="task-title">Nội dung layers/ và skill tổ chức (hai phạm vi)</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Dịch các file quy chuẩn sang tiếng Anh để tiết kiệm token.</div>
+              <div class="task-meta"><span>dep: 3-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="3-5" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">3-5</span>
+                <span class="task-title">Sửa test xung đột</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Giải quyết mâu thuẫn câu chữ giữa invariants và corporate policy.</div>
+              <div class="task-meta"><span>dep: 3-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="4-5" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">4-5</span>
+                <span class="task-title">Đóng chuỗi leo thang quyền qua prompt Dream</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: ToolSandbox khóa prompts/ trong workspace thành READ-ONLY.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="4-1" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">4-1</span>
+                <span class="task-title">memory_versions + purge_workspace()</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Bảng PostgreSQL lưu version, xóa pod không làm mất trí nhớ.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="4-3" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">4-3</span>
+                <span class="task-title">ports/signals.py — struct tín hiệu frozen</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Dataclass đóng băng tín hiệu tương tác cho Dream.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="4-2" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">4-2</span>
+                <span class="task-title">Ba file cá nhân và soul.md dạng dial</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Chuyển soul.md từ văn xuôi sang 5 dial có kiểu (0-100) render động.</div>
+              <div class="task-meta"><span>dep: 4-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="4-4" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">4-4</span>
+                <span class="task-title">Dream hai lượt (Extract &amp; Consolidate)</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Trích xuất tín hiệu không block chat, củng cố bộ nhớ trong đêm.</div>
+              <div class="task-meta"><span>dep: 4-2, 4-3</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="4-6" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">4-6</span>
+                <span class="task-title">Scheduler có gate + batch theo pha</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Lên lịch chạy Dream định kỳ theo batch an toàn không nghẽn database.</div>
+              <div class="task-meta"><span>dep: 4-4</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="4-8" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">4-8</span>
+                <span class="task-title">Dream trích term glossary — alias thuần túy (N1–N4)</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Thu thập từ đồng nghĩa nghiệp vụ từ hội thoại người dùng không tốn thêm token model.</div>
+              <div class="task-meta"><span>dep: 4-4</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="4-7" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">4-7</span>
+                <span class="task-title">Audit diff-grounded trên Postgres</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Lưu trữ sai khác trí nhớ vào audit log Postgres thay vì GitStore cục bộ.</div>
+              <div class="task-meta"><span>dep: 4-4</span></div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ================= WAVE 4 ================= -->
+      <section class="wave-section" data-wave="4">
+        <div class="wave-header">
+          <div class="wave-title">
+            Wave 4 — Dữ liệu, MCP &amp; Gateway / Chi phí
+            <span class="wave-badge">Wave 4</span>
+          </div>
+          <div class="wave-stats">12/28 Done</div>
+        </div>
+        <ul class="task-list">
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="5-2" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-2</span>
+                <span class="task-title">Semantic model + conformance suite</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Định nghĩa schema ngữ nghĩa BigQuery và Neo4j.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-1" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-1</span>
+                <span class="task-title">Hai MCP server CỦA TA — mcp-bq, mcp-neo4j</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Dựng 2 MCP server riêng biệt theo chuẩn AD-41.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>2-5, 1-6</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-8" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-8</span>
+                <span class="task-title">Interceptor đóng dấu danh tính vào request MCP</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Gắn header token JWT định danh người dùng vào cuộc gọi MCP.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>1-6, 5-1</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="5-3" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-3</span>
+                <span class="task-title">Lát semantic + bao đóng join</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Tính toán lát cắt ngữ nghĩa bảng và đường nối join tự động.</div>
+              <div class="task-meta"><span>dep: 5-2, 2-2</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="5-4" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-4</span>
+                <span class="task-title">Chat lẻ tự suy working set</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Nhận diện bảng dữ liệu liên quan từ tin nhắn người dùng.</div>
+              <div class="task-meta"><span>dep: 5-3</span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-6" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-6</span>
+                <span class="task-title">R7 chiều động — group_counts</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Chặn trả kết quả nếu số dòng nhóm nhỏ hơn ngưỡng k.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>2-4, 5-1</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-5" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-5</span>
+                <span class="task-title">CQI + plan cache trong loop</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Cache kế hoạch truy vấn giảm thời gian sinh SQL.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-2, 3-6</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-9" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-9</span>
+                <span class="task-title">CỔNG: Guard đủ 9/9 trước khi trỏ dữ liệu thật</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A (Cổng bảo mật): Kiểm chứng toàn diện 9 luật guard trước khi kết nối DB thật.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>2-3..2-6, 5-1</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="5-10" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-10</span>
+                <span class="task-title">Định tuyến store + thứ tự hai kho</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Phân loại câu hỏi tới kho quan hệ hay đồ thị.</div>
+              <div class="task-meta"><span>dep: 5-2</span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-11" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-11</span>
+                <span class="task-title">Giao lại phạm vi xuyên kho + bind bắt buộc</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Ràng buộc phạm vi kết quả từ Neo4j khi đưa vào SQL WHERE.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-1, 5-10</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-12" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-12</span>
+                <span class="task-title">Trần kết quả + trần lời gọi mỗi lượt + read_only</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Áp đặt giới hạn số dòng trả về và số lần query tối đa.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-1</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-13" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-13</span>
+                <span class="task-title">Job đối chiếu context_scope</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Hậu kiểm đối chiếu khai báo phạm vi với truy vấn thực tế.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-1, 1-6</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-14" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-14</span>
+                <span class="task-title">Đường query trực tiếp qua user_capabilities</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Mở luồng truy vấn nhanh cho người dùng có quyền chuyên sâu.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-1, 5-12</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-15" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-15</span>
+                <span class="task-title">Hợp đồng đầu ra của step (emits + produces)</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Cấu trúc hóa output truyền giữa các bước truy vấn.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-2, 5-10</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-16" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-16</span>
+                <span class="task-title">Planner dựng steps[]</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Kế hoạch phân rã câu hỏi đa kho phức tạp.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-15, 5-10</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-17" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-17</span>
+                <span class="task-title">Kế hoạch hỏng — vai step quyết định cách lan</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Hủy toàn kế hoạch nếu bước định phạm vi hỏng.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-10, 5-12</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-18" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-18</span>
+                <span class="task-title">CQI trả validation_failure</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Bắn sự kiện lên Elixir khi câu SQL không vượt qua CQI.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-5, 5-20</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="5-19" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-19</span>
+                <span class="task-title">Lát ba mức + ba điểm nhắc</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Tối ưu hoá prompt gợi ý ngữ cảnh semantic cho LLM.</div>
+              <div class="task-meta"><span>dep: 5-3, 2-7</span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-20" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-20</span>
+                <span class="task-title">Glossary ba tầng (Corp / Tenant / Project)</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Cấu trúc từ điển thuật ngữ toàn tổ chức và từng trường.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-2, 4-1</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-21" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-21</span>
+                <span class="task-title">In-chat learning — Agent tự tạo alias</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Học thuật ngữ mới trực tiếp trong phiên tương tác.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-20</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="5-22" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-22</span>
+                <span class="task-title">UI glossary-aware rendering (Hợp đồng E9)</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Định dạng chú thích thuật ngữ gửi sang FE Elixir.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>5-20</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="5-23" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">5-23</span>
+                <span class="task-title">Bộ dữ liệu demo chạy hết luồng + seed Neo4j</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn A: Chuẩn bị dữ liệu mẫu trường đại học cho kiểm thử e2e.</div>
+              <div class="task-meta"><span>dep: 5-2</span></div>
+            </div>
+          </li>
+          <!-- DEV 2: LANE B GATEWAY & COSTS -->
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="6-1" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">6-1</span>
+                <span class="task-title">Task class thay cho tier</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: 5 task class phân bổ mô hình AI chính xác theo độ phức tạp công việc.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="6-2" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">6-2</span>
+                <span class="task-title">Model ID production + chặn explicit cache</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Sử dụng model chuẩn hóa và bảo vệ cơ chế prefix caching tự nhiên.</div>
+              <div class="task-meta"><span>dep: 6-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="6-3" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">6-3</span>
+                <span class="task-title">Cost attribution + metric export</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Thu thập số liệu chi phí token theo từng user, phòng ban và task class.</div>
+              <div class="task-meta"><span>dep: 6-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="6-4" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">6-4</span>
+                <span class="task-title">Ba seam per-process của Nanobot → per-request</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Biến DynamicHeadersDict, provider extra_headers và disabled_skills thành per-request.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="6-5" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">6-5</span>
+                <span class="task-title">Attribution per-call + CSV + chốt LIMIT / N</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Làn B: Báo cáo chi phí từng lần gọi ra file CSV và khống chế trần token.</div>
+              <div class="task-meta"><span>dep: 6-1, 6-4</span></div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ================= WAVE 5 ================= -->
+      <section class="wave-section" data-wave="5">
+        <div class="wave-header">
+          <div class="wave-title">
+            Wave 5 — Tích hợp Cắm vào Nanobot
+            <span class="wave-badge">Wave 5</span>
+          </div>
+          <div class="wave-stats">11/12 Done (1 In-Progress)</div>
+        </div>
+        <ul class="task-list">
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-1" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-1</span>
+                <span class="task-title">Ép restrict_to_workspace trong tool Nanobot</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Vùng 5: Bắt buộc mọi tool filesystem giới hạn trong workspace cá nhân.</div>
+              <div class="task-meta"><span>dep: 1-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-2" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-2</span>
+                <span class="task-title">Session key mang chủ sở hữu</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Vùng 1: Scoped chat_id theo workspace_id ngăn chặn nhầm lẫn session.</div>
+              <div class="task-meta"><span>dep: 7-1, 4-1</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-3" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-3</span>
+                <span class="task-title">Lock và prompt assembly</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Vùng 2 &amp; 3: Khóa transaction khi ghép prompt và dựng session.</div>
+              <div class="task-meta"><span>dep: 7-2, 3-2</span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="in-progress">
+            <input type="checkbox" class="task-checkbox" data-key="7-4" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-4</span>
+                <span class="task-title">Auth và memory (TrustedProxy + gỡ GitStore)</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status in-progress">in-progress</span>
+              </div>
+              <div class="task-desc">Vùng 4 (Xong) &amp; Vùng 6: Gỡ hoàn toàn GitStore sang PostgreSQL memory_versions.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>7-3, 4-7</strong> (Vùng 4 done, vùng 6 chờ 4-1)</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-5" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-5</span>
+                <span class="task-title">Test đồng thời hai user hai phòng ban</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Nghiệm thu cách ly đa người dùng dưới tải cao (SessionOwnership + Sandbox + Seams).</div>
+              <div class="task-meta"><span>dep: 7-4</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="joint" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-6" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-6</span>
+                <span class="task-title">Thư viện skill — kho và tool create_skill</span>
+                <span class="badge-dev joint">Dev 1 &amp; 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Kho PostgreSQL + GCS, luật ghi G3/G4 tước always, cấm trùng tên builtin.</div>
+              <div class="task-meta"><span>dep: 7-2</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev1" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-7" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-7</span>
+                <span class="task-title">Chọn skill theo tác vụ — allowlist đảo</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Tự động chọn skill tương ứng với tác vụ cụ thể của người dùng.</div>
+              <div class="task-meta"><span>dep: 7-6</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-8" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-8</span>
+                <span class="task-title">Kho mẫu tài liệu tổ chức — templates/ ngang hàng skills/</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Kho mẫu biểu mẫu corp và phòng ban, không lọc theo dept để bảo vệ prefix cache.</div>
+              <div class="task-meta"><span>dep: 7-6</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-9" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-9</span>
+                <span class="task-title">Sync GCS → workspace cho skill và kho mẫu</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">GCSWorkspaceSynchronizer đồng bộ khi dựng session, tước always: true, chặn scripts/.</div>
+              <div class="task-meta"><span>dep: 7-6, 7-8, 6-4</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-10" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-10</span>
+                <span class="task-title">Test: Tên tool trong SKILL.md phải tồn tại</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Test cấu trúc quét AST đối chiếu tên tool trong backtick với registry thật của Nanobot.</div>
+              <div class="task-meta"><span>dep: 7-8</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="joint" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-11" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-11</span>
+                <span class="task-title">Tắt builtin skill Nanobot không dùng</span>
+                <span class="badge-dev joint">Dev 1 &amp; 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Tắt 7 skill thừa qua disabled_skills, tiết kiệm ~278 token mỗi lượt người dùng.</div>
+              <div class="task-meta"><span>dep: —</span></div>
+            </div>
+          </li>
+          <li class="task-item done" data-dev="dev2" data-status="done">
+            <input type="checkbox" class="task-checkbox" data-key="7-12" checked />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">7-12</span>
+                <span class="task-title">Luật ngôn ngữ: Prompt tiếng Anh, đầu ra tiếng Việt</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status done">done</span>
+              </div>
+              <div class="task-desc">Giảm 2.66× token cl100k_base. Thêm ## Output language cho toàn bộ SKILL.md.</div>
+              <div class="task-meta"><span>dep: 7-8</span></div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ================= WAVE 6 ================= -->
+      <section class="wave-section" data-wave="6">
+        <div class="wave-header">
+          <div class="wave-title">
+            Wave 6 — GKE Vận hành &amp; Nghiệm thu Đóng Sprint
+            <span class="wave-badge">Wave 6</span>
+          </div>
+          <div class="wave-stats">0/5 Done</div>
+        </div>
+        <ul class="task-list">
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="8-1" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">8-1</span>
+                <span class="task-title">Cluster private + Workload Identity + GSA least privilege</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Cụm GKE private multi-zone, không key file, gán quyền tối thiểu cho GSA.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>1-5, 7-5, X3</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev1" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="8-2" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">8-2</span>
+                <span class="task-title">NetworkPolicy 6 đích + default deny + ba lớp policy</span>
+                <span class="badge-dev dev1">Dev 1</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn A: Chặn Internet hoàn toàn, chỉ cho phép agent-host egress 6 đích nội bộ.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>8-1</strong></span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev2" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="8-3" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">8-3</span>
+                <span class="task-title">PgBouncer + xác minh advisory xact lock</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn B: Transaction pooling nâng trần kết nối Cloud SQL, xác minh lock an toàn.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>8-1</strong> (Dev 1)</span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="dev2" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="8-4" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">8-4</span>
+                <span class="task-title">WSS drain, HPA theo kết nối, Flow Logs</span>
+                <span class="badge-dev dev2">Dev 2</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Làn B: PDB maxUnavailable=0 + preStop drain đo p95; HPA autoscaling theo websocket active.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>8-2</strong> (Dev 1)</span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="joint" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="8-5" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">8-5</span>
+                <span class="task-title">Nghiệm thu lại feature chỉ-test-local (Đóng AD-16)</span>
+                <span class="badge-dev joint">Dev 1 &amp; 2</span>
+                <span class="chip-status not-started">not-started</span>
+              </div>
+              <div class="task-desc">Chung: Chạy toàn bộ test suite trên staging có NetworkPolicy 6 đích và IAM thật.</div>
+              <div class="task-meta"><span class="task-dep">dep: <strong>8-2, 8-3, 8-4, X3</strong></span></div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ================= EXTERNAL ACTIONS ================= -->
+      <section class="wave-section" data-wave="ext">
+        <div class="wave-header">
+          <div class="wave-title">
+            Hành động ngoài code (Đường găng liên team)
+            <span class="wave-badge">Liên team</span>
+          </div>
+          <div class="wave-stats">0/3 Sent</div>
+        </div>
+        <ul class="task-list">
+          <li class="task-item" data-dev="joint" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="X1" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">X1</span>
+                <span class="task-title">Gửi M5, M6, M7 cho team Data</span>
+                <span class="badge-dev joint">Liên team</span>
+                <span class="chip-status not-started">not-sent</span>
+              </div>
+              <div class="task-desc">Chặn 5-2, 5-3, 5-6: Thống nhất dialect SQL, schema VIEW và cấp role BigQuery/Neo4j.</div>
+              <div class="task-meta"><span>Ảnh hưởng: Wave 4</span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="joint" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="X2" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">X2</span>
+                <span class="task-title">Gửi E1 (hợp đồng token) và E4–E7 cho team Elixir</span>
+                <span class="badge-dev joint">Liên team</span>
+                <span class="chip-status not-started">not-sent</span>
+              </div>
+              <div class="task-desc">Chặn 4-2, 4-4, 5-4, 7-7: Token danh tính JWT và 4 sự kiện neo trạng thái.</div>
+              <div class="task-meta"><span>Ảnh hưởng: Wave 4 &amp; 5</span></div>
+            </div>
+          </li>
+          <li class="task-item" data-dev="joint" data-status="not-started">
+            <input type="checkbox" class="task-checkbox" data-key="X3" />
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="task-key">X3</span>
+                <span class="task-title">Hỏi pháp chế về vùng dữ liệu (Nghị định 13/2023)</span>
+                <span class="badge-dev joint">Liên team</span>
+                <span class="chip-status not-started">not-sent</span>
+              </div>
+              <div class="task-desc">Chặn 8-1, 8-5: Vùng lưu trữ GCP cho khối trường học và bệnh viện tập đoàn.</div>
+              <div class="task-meta"><span>Ảnh hưởng: Wave 6</span></div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+    </main>
+
+    <footer>
+      Nanobot IDP Spec Checklist &nbsp;·&nbsp; Đồng bộ từ <code>_bmad-output/implementation-artifacts/sprint-status.yaml</code> &nbsp;·&nbsp;
+      Trạng thái Git: Tất cả remote branches đã pull &amp; cập nhật đầy đủ.
+    </footer>
+  </div>
+
+  <script>
+    // Filtering Logic
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const searchBox = document.getElementById('search-box');
+    const taskItems = document.querySelectorAll('.task-item');
+
+    let currentDev = 'all';
+    let currentStatus = 'all';
+    let currentQuery = '';
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const group = btn.parentElement;
+        group.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filterType = btn.dataset.filter;
+        const val = btn.dataset.val;
+
+        if (filterType === 'dev') currentDev = val;
+        if (filterType === 'status') currentStatus = val;
+
+        applyFilters();
+      });
+    });
+
+    searchBox.addEventListener('input', (e) => {
+      currentQuery = e.target.value.toLowerCase().trim();
+      applyFilters();
+    });
+
+    function applyFilters() {
+      taskItems.forEach(item => {
+        const itemDev = item.dataset.dev;
+        const itemStatus = item.dataset.status;
+        const text = item.textContent.toLowerCase();
+
+        const matchDev = (currentDev === 'all') || (itemDev === currentDev) || (currentDev === 'joint' && itemDev === 'joint');
+        const matchStatus = (currentStatus === 'all') || (itemStatus === currentStatus);
+        const matchQuery = !currentQuery || text.includes(currentQuery);
+
+        if (matchDev && matchStatus && matchQuery) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      // Hide empty wave sections
+      document.querySelectorAll('.wave-section').forEach(sec => {
+        const visibleItems = sec.querySelectorAll('.task-item:not([style*="display: none"])');
+        sec.style.display = visibleItems.length === 0 ? 'none' : 'block';
+      });
+    }
+
+    // Dynamic stats update from checkboxes
+    const checkboxes = document.querySelectorAll('.task-checkbox');
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        const item = cb.closest('.task-item');
+        if (cb.checked) {
+          item.classList.add('done');
+          item.dataset.status = 'done';
+          const chip = item.querySelector('.chip-status');
+          if (chip) {
+            chip.className = 'chip-status done';
+            chip.textContent = 'done';
+          }
+        } else {
+          item.classList.remove('done');
+          item.dataset.status = 'not-started';
+          const chip = item.querySelector('.chip-status');
+          if (chip) {
+            chip.className = 'chip-status not-started';
+            chip.textContent = 'not-started';
+          }
+        }
+        recalculateProgress();
+      });
+    });
+
+    function recalculateProgress() {
+      const total = checkboxes.length;
+      const checked = document.querySelectorAll('.task-checkbox:checked').length;
+      const pct = ((checked / total) * 100).toFixed(1);
+
+      document.getElementById('stat-completed').textContent = checked;
+      document.getElementById('stat-pct').textContent = `${pct}% hoàn thành`;
+      document.getElementById('bar-pct').textContent = `${pct}%`;
+      document.getElementById('bar-fill').style.width = `${pct}%`;
+      document.getElementById('bd-done').textContent = checked;
+      document.getElementById('bd-rem').textContent = total - checked;
+    }
+  </script>
+</body>
+</html>
